@@ -1,4 +1,4 @@
-import re
+import logging
 import platform
 import subprocess
 from typing import List
@@ -8,6 +8,8 @@ from pydub import AudioSegment
 from abc import ABC, abstractmethod
 import os
 import edge_tts
+
+logger = logging.getLogger(__name__)
 
 class Player(ABC):
     
@@ -83,17 +85,13 @@ class EdgeTTSPlayer(Player):
 class SoundBlockPlayer(Player):
     def __init__(self, sound_dir, temp_dir):                
         self.sound_dir = Path(sound_dir)
-        self.temp_dir =Path(temp_dir)
-        #os.makedirs(self.temp_dir, exist_ok=True)
+        self.temp_dir =Path(temp_dir)        
 
-    def create_sound_array(self, message: str) -> List[str]:
-        #Split message into blocks and map to wav files.
-        #Raise error if file not found
+    def create_sound_files_array(self, message: List[str]) -> List[Path]:
+        #map to wav files. Raise error if file not found
         files = []
-        parts = re.split(r"\s+", message.lower())
-
-        for part in parts:            
-            part = part.strip()
+        
+        for part in message:                        
 
             #if numeric
             if part.isnumeric():
@@ -104,7 +102,7 @@ class SoundBlockPlayer(Player):
                     hundreds_file=self.sound_dir / f"{hundreds}"
                     
                     if hundreds_file.is_file():
-                        files.append(str(hundreds_file))
+                        files.append(hundreds_file)
                     else:
                         raise FileNotFoundError(f"Missing hundreds file: {hundreds}")
 
@@ -127,10 +125,15 @@ class SoundBlockPlayer(Player):
             else:
                 word_file = self.sound_dir / f'{part}'
                 if word_file.is_file():
-                    files.append(str(word_file))
+                    files.append(word_file)
                 else:
+                    logger.warning(f"Missing word file: {part}")        
                     raise FileNotFoundError(f"Missing word file: {part}")
         
+
+        for file in files:
+            logger.info(f"file {file}")
+
         return files
     
     def join_and_convert(self, files: List[Path], output: Path):

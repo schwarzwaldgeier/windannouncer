@@ -8,6 +8,10 @@ from windrecord import WindRecord
 from broadcaster import Broadcaster
 from datetime import datetime
 import os
+from logging_config import setup_logging
+
+setup_logging()
+
 # -------------------- CONFIG --------------------
 BROADCAST_INTERVAL : int = 15  #minutes
 
@@ -18,6 +22,7 @@ if system() == "Windows":
     TEMP_DIR = Path("C:/temp")
 else:
     TEMP_DIR = Path("/tmp")
+
 
 def get_sigint_handler():
     waiter = Event()

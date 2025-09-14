@@ -78,8 +78,8 @@ class WindRecord:
 
     def __repr__(self):
         return (f"WindRecord({self.datetime_timestamp}, "
-        f"avg5={self.wind_speed_5_min}km/h {self.str_wind_dir_5_min_verbose}, "
-        f"gust5={self.wind_gust_5_min}km/h {self.str_wind_dir_of_gust_5_min_verbose})")
+        f"avg5={self.wind_speed_5_min} km/h, {self.str_wind_dir_5_min_short}, "
+        f"gust20={self.wind_gust_20_min} km/h, {self.str_wind_dir_of_gust_20_min_short} ")
 
 
     def is_recent(self, max_age=3) -> bool:

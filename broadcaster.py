@@ -127,7 +127,7 @@ class Broadcaster:
             except Exception as e:
                                 
                 print(f"[LISTENER] Error during fetch: {e}. Retrying in {backoff}s.", flush=True)
-                #traceback.print_exc()
+                traceback.print_exc()
                 #sigint_handler_event.wait(estimated_wait_time)
                 for _ in range(int(backoff)):
                     if sigint_handler_event.is_set():
