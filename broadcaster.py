@@ -37,7 +37,7 @@ class Broadcaster:
         return (ts // self.station_interval + 1) * self.station_interval
     
     #******* CORE LOOP *******
-    def listen(
+    def listen( 
         self,
         sigint_handler_event: Event,
         max_iterations: Optional[int] = None,
@@ -72,10 +72,10 @@ class Broadcaster:
             first_run = False
 
             try:
-                end = int(datetime.now().timestamp())                
-                start = self.last_record_ts
+                end = int(datetime.now().timestamp())                                              
+                start = max(self.last_record_ts + 1, end - (self.station_interval * self.history_size))
 
-                print(f"[LISTENER] Request historic data from {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
+                print(f"[LISTENER] Request data from {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
                 historic_data = self.client.get_historic_data(start, end)
                 if historic_data == None:
@@ -85,9 +85,10 @@ class Broadcaster:
 
                 if not new_records:
                     print("[LISTENER] No wind records, retrying later...")
-                    continue
-                
-                fresh = [rec for rec in reversed(new_records) if rec.timestamp > self.last_record_ts]                
+                    continue                                
+                                
+                fresh = [rec for rec in new_records if rec.timestamp > self.last_record_ts]
+                fresh.sort(key=lambda x: x.timestamp)
 
                 if not fresh:
                     print("[LISTENER] No new wind records. Skipping this cycle.")
