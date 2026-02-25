@@ -142,174 +142,43 @@ class WeatherlinkClient:
         return True
    
 
-    def mph_to_kph(self, mph: float, precision=0) -> float:
+    def mph_to_kph(self, mph: float, precision=0) -> int:
         kph = mph * 1.60934
-        return round(kph, precision)
+        return int(round(kph))
 
+#not used for now, but may be useful for future expansion to current conditions endpoint
+    # def get_current_sensor_data(self):
+    #     ''' Sensor Type: 27 '''
+    #     ''' Manufacturer: Davis Instruments '''
+    #     ''' Product Name: Vantage Pro2, Cabled, Metric '''
+    #     ''' Product Number: 6322CM '''
+    #     ''' Category: ISS '''
+    #     ''' Data Structure Type: 6 '''
+    #     ''' Data Structure Description: EnviroMonitor ISS Current Conditions Record '''
 
-    def get_current_sensor_data(self):
-        ''' Sensor Type: 27 '''
-        ''' Manufacturer: Davis Instruments '''
-        ''' Product Name: Vantage Pro2, Cabled, Metric '''
-        ''' Product Number: 6322CM '''
-        ''' Category: ISS '''
-        ''' Data Structure Type: 6 '''
-        ''' Data Structure Description: EnviroMonitor ISS Current Conditions Record '''
-
-        params_str = "&".join([f"{key}={value}" for key, value in self.get_parameters.items()])
-        print(f"params string {params_str}")
-        url = f"{self.base_url}/current/{self.station_id}?{params_str}"
-        print(url)
-        response = get(url, headers=self.headers)
-        data = response.json()
-        return data
+    #     params_str = "&".join([f"{key}={value}" for key, value in self.get_parameters.items()])
+    #     print(f"params string {params_str}")
+    #     url = f"{self.base_url}/current/{self.station_id}?{params_str}"
+    #     print(url)
+    #     response = get(url, headers=self.headers)
+    #     data = response.json()
+    #     return data
     
 
-    def parse_current_sensor_data(self, response) -> WindRecord:
-        for sensor in response.get("sensors", []):
-            if sensor.get("sensor_type") == 27:
-                for entry in sensor.get("data", []):
-                    wind_entry = {
-                        "timestamp": entry.get("ts"),
-                        "wind_dir": entry.get("wind_dir"),
-                        "wind_dir_of_gust_10_min": entry.get("wind_dir_of_gust_10_min"),
-                        "wind_gust_10_min": entry.get("wind_gust_10_min"),
-                        "wind_speed": entry.get("wind_speed"),
-                        "wind_speed_2_min": entry.get("wind_speed_2_min"),
-                        "wind_speed_10_min": entry.get("wind_speed_10_min")
-                    }
+    # def parse_current_sensor_data(self, response) -> dict:
+    #     for sensor in response.get("sensors", []):
+    #         if sensor.get("sensor_type") == 27:
+    #             for entry in sensor.get("data", []):
+    #                 wind_entry = {
+    #                     "timestamp": entry.get("ts"),
+    #                     "wind_dir": entry.get("wind_dir"),
+    #                     "wind_dir_of_gust_10_min": entry.get("wind_dir_of_gust_10_min"),
+    #                     "wind_gust_10_min": entry.get("wind_gust_10_min"),
+    #                     "wind_speed": entry.get("wind_speed"),
+    #                     "wind_speed_2_min": entry.get("wind_speed_2_min"),
+    #                     "wind_speed_10_min": entry.get("wind_speed_10_min")
+    #                 }
 
-                    #print(wind_entry)
+    #                 #print(wind_entry)
 
-        return wind_entry
-
-#     # @lru_cache
-#     def get_sensors_data(self, sensor_id_list):
-#         sensors_list_comma_separated = ",".join(map(str, sensor_id_list))
-#         params_str = "&".join([f"{key}={value}" for key, value in self.get_parameters.items()])
-#         url = f"{self.base_url}/sensors/{str(sensors_list_comma_separated)}?{params_str}"
-#         response = get(url, headers=self.headers)
-#         data = response.json()
-#         return data
-
-#     def get_single_sensor_data(self, sensor_id):
-#         params_str = "&".join([f"{key}={value}" for key, value in self.get_parameters.items()])
-#         url = f"{self.base_url}/sensors/{sensor_id}?{params_str}"
-#         response = get(url, headers=self.headers)
-#         data = response.json()
-#         return data
-
-#     def get_sensor_catalog(self):
-#         params_str = "&".join([f"{key}={value}" for key, value in self.get_parameters.items()])
-#         url = f"{self.base_url}/sensor-catalog?{params_str}"
-#         response = get(url, headers=self.headers)
-#         data = response.json()
-#         return data
-
-#     def convert_wind_dir(self, ordinal: int) -> str:
-#         if ordinal < 0 or ordinal > 15:
-#             raise ValueError("Must be a value between 0 and 15")
-#         directions = [
-#             "N", "NNO", "NO", "ONO", "O", "OSO", "SO", "SSO",
-#             "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
-#         ]
-
-#         return directions[ordinal]
-
-
-#     def inches_of_mercury_to_hpa(self, inches: float) -> float:
-#         return inches * 33.8639
-
-#     def generate_wind_records_html(self, wind_records, n):
-
-#         html = """<!doctype html>
-# <html>
-#         <head>
-#             <title>
-#             Wetter Merkur
-#             </title>
-#         </head>
-#         <body>
-#         <style>
-#     table {
-#         width: 90%;
-#         border-collapse: collapse;
-#     }
-#     th, td {
-#         padding: 8px 12px;
-#         border: 1px solid #ddd;
-#         text-align: center;
-#     }
-#     th {
-#         background-color: #f2f2f2;
-#     }
-#     tr:nth-child(even) {
-#         background-color: #f9f9f9;
-#     }
-    
-#     tr:nth-child(2) {
-#     font-size: 150%;
-#     }
-    
-#     .speed {
-#         font-size: 150%;   
-#     }
-    
-#     .direction {
-#         font-size: 150%;   
-        
-#     }
-# </style>
-#         <table border="1" >
-#             <tr>
-#                 <th>&nbsp;</th>
-#                 <th>Wind Ø</th>
-#                 <th>Wind max.</th>
-#             </tr>
-#         """
-
-#         arrow_svg_template = """
-#                     <svg 
-                   
-#                     width="65"
-#                     viewBox="0 0 100 75" 
-#                     xmlns="http://www.w3.org/2000/svg">
-#                       <g transform="rotate({rotation}, 50, 50)">
-#                         <polygon points="50,15 60,50 50,40 40,50" fill="black" />
-#                       </g>
-#                     </svg>
-#                     """
-#         td_template = ("""
-#         <td 
-#             style="vertical-align: middle; font-size: 1.2em;">
-#             <span class="speed">
-#                 {speed}
-#             </span>&nbsp;km/h&nbsp;
-
-#             <span class="direction">
-#                 {direction} {svg}
-#             </span>
-#         </td>
-#         """)
-
-#         rotation = 22.5
-#         for record in wind_records[:n]:
-#             avg_direction_svg = arrow_svg_template.format(rotation=record.avg_direction * rotation + 180)
-#             max_direction_svg = arrow_svg_template.format(rotation=record.max_direction * rotation + 180)
-
-#             avg_td = td_template.format(speed=int(record.avg_speed),
-#                                         direction=self.convert_wind_dir(record.avg_direction), svg=avg_direction_svg)
-#             max_td = td_template.format(speed=int(record.max_speed),
-#                                         direction=self.convert_wind_dir(record.max_direction), svg=max_direction_svg)
-
-#             html += f"""
-#             <tr>
-#                 <td><span>{(datetime.fromtimestamp(record.timestamp)
-#                       + timedelta(hours=1)).strftime('%H:%M')}</span></td>
-#                 {avg_td}
-#                 {max_td}
-#             </tr>
-#             """
-
-#         html += "</table></body></html>"
-#         return html
+    #     return wind_entry

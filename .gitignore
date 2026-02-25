@@ -1,7 +1,7 @@
 #
-test_weatherlink_client.py
-broadcaster_current.py
-test.py
+wind.log
+wind.log1
+wind.log2
 
 # Editors
 .vscode/

@@ -5,7 +5,7 @@ def setup_logging():
     handler = RotatingFileHandler(
         'wind.log',
         maxBytes = 1 * 1024 * 1024,  #1 MB
-        backupCount = 3              
+        backupCount = 2              
     )
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)

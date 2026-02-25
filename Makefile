@@ -2,7 +2,7 @@
 default: help
 
 # Always run these targets even if a file with the same name exists
-.PHONY: help install run lint test test-cov clean venv
+.PHONY: help install run venv
 
 ## help: show this help message
 help: Makefile
@@ -21,17 +21,6 @@ install: venv
 run:
 	. .venv/bin/activate && python main.py
 
-## lint: run linter
-# lint:
-# 	. .venv/bin/activate && pylint **/*.py
-
-## test: run pytest
-# test:
-# 	. .venv/bin/activate && pytest
-
-## test-cov: run pytest with coverage
-# test-cov:
-# 	. .venv/bin/activate && pytest --cov
 
 ## clean: remove cache files
 clean:

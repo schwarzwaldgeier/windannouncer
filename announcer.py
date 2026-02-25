@@ -11,17 +11,10 @@ class WindAnnouncer:
         self.sound_player = player
         self.interval=interval - max_age
         self.max_age=max_age
-        self._last_record_timestamp: datetime | None = None
+        self._last_record_timestamp: int | None = None
 
-    def _is_valid_record(self, record: WindRecord) -> bool:                
-        
-        if not hasattr(record , "timestamp"):
-            return False
-        
-        if not record.is_recent(self.max_age):
-            return False
-        
-        return True
+    def _is_valid_record(self, record: WindRecord) -> bool:
+        return hasattr(record, "timestamp") and record.is_recent(self.max_age)
                      
     def _can_announce(self, record: WindRecord) -> bool:
 
@@ -62,11 +55,9 @@ class WindAnnouncer:
 
         #message for TTS soundplayer
         msg_tts = (
-                    f"Hier ist die Wetterstation des Gleitschirmvereins Baden auf dem Merkur. "            
-                    #f"Aktuelle Windmessung:  {record.current_direction} {record.current_speed} Kilometer pro Stunde. " #no current speed from historic sensor, instead using 5 minutes average
+                    f"Hier ist die Wetterstation des Gleitschirmvereins Baden auf dem Merkur. "                                
                     f"Durchschnittlicher Wind der letzten 5 Minuten:  {record.str_wind_dir_5_min_verbose} {record.wind_speed_5_min} Kilometer pro Stunde. "
-                    f"Stärkste Windböe der letzten 20 Minuten: {record.str_wind_dir_of_gust_20_min_verbose} {record.wind_gust_20_min} Kilometer pro Stunde. "
-                    #f"Tschüss! "
+                    f"Stärkste Windböe der letzten 20 Minuten: {record.str_wind_dir_of_gust_20_min_verbose} {record.wind_gust_20_min} Kilometer pro Stunde. "                    
                   )
         
         print(f"[WindAnnouncer {datetime.now():%H:%M:%S}] Start announcing...\n")
@@ -85,8 +76,7 @@ class WindAnnouncer:
                 print(f"[SoundblockPlayer ERROR] {e}")
                 
         elif isinstance(self.sound_player, EdgeTTSPlayer):
-            print("[TTS Mode with EdgeTTSPlayer]")
-            #self.sound_player.play_message(msg_tts)
+            print("[TTS Mode with EdgeTTSPlayer]")            
             print(msg_tts)
             asyncio.run(self.sound_player.play_message(msg_tts))
 

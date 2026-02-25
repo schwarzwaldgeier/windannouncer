@@ -5,7 +5,7 @@ from typing import List
 from pathlib import Path
 import platform
 from pydub import AudioSegment
-from abc import ABC, abstractmethod
+from abc import ABC
 import os
 import edge_tts
 
@@ -13,9 +13,6 @@ logger = logging.getLogger(__name__)
 
 class Player(ABC):
     
-    @abstractmethod
-    def play_message(self, msg: str):
-        pass
 
     def playback_wav_mp3(self, out_file):
 
@@ -160,6 +157,7 @@ class SoundBlockPlayer(Player):
 
             try:
                 self.join_and_convert(files, out_file)
+            
             except Exception as e:
                 print(f"[SoundBlockPlayer ERROR] Failed to join WAV files: {e}")
                 return
